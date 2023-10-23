@@ -1,4 +1,4 @@
-(ns db
+(ns rinha.db
   (:require [clojure.java.jdbc :as j]
             [honey.sql :as sql]
             [hikari-cp.core :as cp])

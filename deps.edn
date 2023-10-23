@@ -1,4 +1,4 @@
-{:paths ["src"]
+{:paths ["src" "resources"]
  :deps {io.pedestal/pedestal.service {:mvn/version "0.5.9"}
         io.pedestal/pedestal.route {:mvn/version "0.5.9"}
         io.pedestal/pedestal.immutant {:mvn/version "0.5.9"}
@@ -9,7 +9,8 @@
         org.postgresql/postgresql {:mvn/version "42.3.3"}
         com.github.seancorfield/honeysql {:mvn/version "2.4.1078"}
         clova/clova {:mvn/version "0.46.0"}
-        hikari-cp {:mvn/version "3.0.1"}}
+        hikari-cp {:mvn/version "3.0.1"}
+        aero {:mvn/version "1.1.6"}}
 
  :aliases
  {:test {:extra-paths ["test"]}}}

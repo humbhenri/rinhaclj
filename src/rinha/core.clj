@@ -1,9 +1,14 @@
-(ns core (:require [io.pedestal.http :as http]
+(ns rinha.core (:require [io.pedestal.http :as http]
                    [io.pedestal.http.route :as route]
                    [io.pedestal.http.content-negotiation :as conneg]
                    [clojure.string :as str]
                    [clojure.data.json :as json]
-                   [db :as db]))
+                   [clojure.java.io :as io]
+                   [rinha.db :as db]
+                   [aero.core :refer [read-config]]))
+
+(defn get-config []
+  (read-config (io/resource "config.edn")))
 
 (defn response [status body & {:as headers}]
   {:status status :body body :headers headers})
@@ -41,7 +46,7 @@
 (def service-map
   {::http/routes routes
    ::http/type   :immutant
-   ::http/port   (parse-long (or (System/getenv "PORT") "3000"))})
+   ::http/port   (get-in (get-config) [:server :port])})
 
 (defn start []
   (http/start (http/create-server service-map)))

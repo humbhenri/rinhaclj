@@ -1,4 +1,4 @@
-(ns model
+(ns rinha.model
   (:require [clova.core :refer :all]))
 
 (validate [:nome required? stringy? [longer? 0] [shorter? 101]
