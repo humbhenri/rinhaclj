@@ -1,0 +1,25 @@
+#+title: Api
+
+#+begin_src restclient
+GET http://localhost:3000/hello
+#+end_src
+
+#+RESULTS:
+#+BEGIN_SRC js
+{:id 1, :nome "Humberto"}
+// GET http://localhost:3000/hello
+// HTTP/1.1 200 OK
+// X-Permitted-Cross-Domain-Policies: none
+// X-Download-Options: noopen
+// Server: undertow
+// X-XSS-Protection: 1; mode=block
+// X-Frame-Options: DENY
+// Content-Security-Policy: object-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' 'strict-dynamic' https: http:;
+// Date: Wed, 11 Oct 2023 14:38:24 GMT
+// Connection: keep-alive
+// Strict-Transport-Security: max-age=31536000; includeSubdomains
+// X-Content-Type-Options: nosniff
+// Transfer-Encoding: chunked
+// Content-Type: application/edn
+// Request duration: 0.004939s
+#+END_SRC
