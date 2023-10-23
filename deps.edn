@@ -8,7 +8,8 @@
         org.clojure/java.jdbc {:mvn/version "0.7.12"}
         org.postgresql/postgresql {:mvn/version "42.3.3"}
         com.github.seancorfield/honeysql {:mvn/version "2.4.1078"}
-        clova/clova {:mvn/version "0.46.0"}}
+        clova/clova {:mvn/version "0.46.0"}
+        hikari-cp {:mvn/version "3.0.1"}}
 
  :aliases
  {:test {:extra-paths ["test"]}}}

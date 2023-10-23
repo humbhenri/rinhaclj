@@ -2,7 +2,8 @@
                    [io.pedestal.http.route :as route]
                    [io.pedestal.http.content-negotiation :as conneg]
                    [clojure.string :as str]
-                   [clojure.data.json :as json]))
+                   [clojure.data.json :as json]
+                   [db :as db]))
 
 (defn response [status body & {:as headers}]
   {:status status :body body :headers headers})
@@ -28,10 +29,14 @@
     {:status 200}
     {:status 400}))
 
+(defn contagem-pessoas-route [request]
+  (ok (str (db/contagem-pessoas)) {"content-type" "text/plain"}))
+
 (def routes
   (route/expand-routes
    #{
-     ["/pessoas" :get pessoas :route-name :pessoas]}))
+     ["/pessoas" :get pessoas :route-name :pessoas]
+     ["/contagem-pessoas" :get contagem-pessoas-route :route-name :contagem-pessoas-route]}))
 
 (def service-map
   {::http/routes routes
@@ -56,3 +61,4 @@
 (defn restart []
   (stop-dev)
   (start-dev))
+
