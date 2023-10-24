@@ -3,6 +3,7 @@
             [clojure.string :as str]
             [honey.sql :as sql]
             [hikari-cp.core :as cp]
+            [taoensso.timbre :as timbre]
             [rinha.config :as config])
   (:import [java.util UUID]))
 
@@ -39,7 +40,13 @@
         text (str/join (->> (:stack value) (map str/lower-case) str/join)
                        (list (:apelido value) (:nome value)))
         id (UUID/randomUUID)]
-    (j/insert! database-connection :pessoaentity (assoc value :stack stack :text text :id id))))
+    (try
+      (j/insert! database-connection :pessoaentity (assoc value :stack stack :text text :id id))
+      (catch java.lang.Exception e
+        (timbre/error (.getMessage e))
+        (if (str/includes? (.getMessage e) "ERROR: duplicate key value")
+          (throw (ex-info "apelido duplicado" {:type :apelido-duplicado}))
+          (throw (ex-info "erro genérico" {:type :erro-generico})))))))
 
 (defn contagem-pessoas []
   (-> {:select [[[:count :*]]] :from [:pessoaentity]}

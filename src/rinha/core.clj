@@ -85,12 +85,11 @@
 (def service-error-handler
   (error/error-dispatch [ctx ex]
                         :else
-                        (let [message (->> ex
-                                           .getData
-                                           :exception
-                                           .getMessage)]
-                          (timbre/error message)
-                          (if (str/includes? message "ERROR: duplicate key value")
+                        (let [{:keys [type]} (->> ex
+                                                   .getData
+                                                   :exception
+                                                   ex-data)]
+                          (if (= type :apelido-duplicado)
                             (assoc ctx :response (unprocessable-content "error"))
                             (assoc ctx :response (bad-request "error"))))))
 
