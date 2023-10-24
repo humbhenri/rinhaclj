@@ -18,9 +18,13 @@
   (route/url-for-routes sut/routes))
 
 
-(deftest rinha-test
+(deftest pesquisa
   (testing "pesquisa pessoas"
     (testing "/pessoas sem termo de busca deve retornar erro com código 400"
       (is (= 400 (:status (test-request :get "/pessoas")))))
     (testing "com termo de busca deve ter status 200"
       (is (= 200 (:status (test-request :get "/pessoas?t=node")))))))
+
+(deftest detalhe
+  (testing "detalhe de uma pessoa que nao existe deve retornar 404"
+    (is (= 404 (:status (test-request :get "/pessoas/xyz"))))))

@@ -52,15 +52,34 @@
 (defn contagem-pessoas-route [request]
   (ok (str (db/contagem-pessoas)) {"content-type" "text/plain"}))
 
+(defmacro if-let*
+  ([bindings then]
+   `(if-let* ~bindings ~then nil))
+  ([bindings then else]
+   (if (seq bindings)
+     `(if-let [~(first bindings) ~(second bindings)]
+        (if-let* ~(drop 2 bindings) ~then ~else)
+        ~(if-not (second bindings) else))
+     then)))
+
+(defn detalhe-pessoa-route [request]
+  (if-let* [id (get-in request [:path-params :id])
+           detalhe (db/detalhe-pessoa id)]
+    (ok detalhe)
+    {:status 404}))
+
 (def service-error-handler
   (error/error-dispatch [ctx ex]
                         :else
-                        (assoc ctx :response {:status 400 :body "error"})))
+                        (do
+                         (prn ex)
+                         (assoc ctx :response {:status 400 :body "error"}))))
 
 (def routes
   (route/expand-routes
    #{
      ["/pessoas" :get [service-error-handler coerce-body content-neg-intc pesquisa-termo-route] :route-name :pesquisa-termo-route]
+     ["/pessoas/:id" :get [service-error-handler coerce-body content-neg-intc detalhe-pessoa-route] :route-name :detalhe-pessoa-route]
      ["/contagem-pessoas" :get contagem-pessoas-route :route-name :contagem-pessoas-route]}))
 
 (def service-map

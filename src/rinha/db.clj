@@ -48,9 +48,13 @@
       :count))
 
 (defn formata-pessoa [pessoa]
-  (-> pessoa
-      (update :stack #(str/split % #","))
-      (dissoc :text)))
+  (if pessoa
+    (-> pessoa
+        (update :stack #(str/split % #","))
+        (dissoc :text))
+    nil))
+
+
 
 (defn pesquisa-termo [termo]
   (->> {:select [:*] :from :pessoaentity :where [:like :text (str/join ["%" termo "%"])]}
@@ -58,5 +62,15 @@
       select
       (map formata-pessoa)))
 
+(defn detalhe-pessoa [id]
+  (->> {:select [:*] :from :pessoaentity :where [:= :id (UUID/fromString id)]}
+       sql/format
+      select
+      first
+      formata-pessoa))
+
 ;; (cria-pessoa {:id (UUID/randomUUID) :apelido "humb" :nome "Humberto" :nascimento "2000-10-01" :stack '("C#" "Node" "Oracle")})
 ;; (pesquisa-termo "humb")
+
+;; (select (sql/format {:select [:*] :from :pessoaentity}))
+;; (detalhe-pessoa (str (UUID/randomUUID)))
