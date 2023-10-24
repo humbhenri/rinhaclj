@@ -2,6 +2,7 @@
                    [io.pedestal.http.route :as route]
                    [io.pedestal.http.content-negotiation :as conneg]
                    [io.pedestal.interceptor.error :as error]
+                   [io.pedestal.http.body-params :as body-params]
                    [clojure.string :as str]
                    [clojure.data.json :as json]
                    [rinha.db :as db]
@@ -13,6 +14,12 @@
 (def ok       (partial response 200))
 
 (def created  (partial response 201))
+
+(def bad-request  (partial response 400))
+
+(def not-found (partial response 404))
+
+(def unprocessable-content (partial response 422))
 
 (defn transform-content
   [body content-type]
@@ -47,7 +54,7 @@
 (defn pesquisa-termo-route [request]
   (if-let [termo (get-in request [:query-params :t])]
     (ok (db/pesquisa-termo termo))
-    {:status 400}))
+    (bad-request)))
 
 (defn contagem-pessoas-route [request]
   (ok (str (db/contagem-pessoas)) {"content-type" "text/plain"}))
@@ -66,19 +73,27 @@
   (if-let* [id (get-in request [:path-params :id])
            detalhe (db/detalhe-pessoa id)]
     (ok detalhe)
-    {:status 404}))
+    (not-found)))
+
+(defn new-pessoa-route [request]
+  (if-let* [pessoa (:json-params request)
+            pessoa-criada (db/cria-pessoa pessoa)]
+    (ok (:id pessoa-criada))
+    (bad-request)))
 
 (def service-error-handler
   (error/error-dispatch [ctx ex]
                         :else
-                        (do
-                         (prn ex)
-                         (assoc ctx :response {:status 400 :body "error"}))))
+                        (let [message (.getMessage (:exception (.getData ex)))]
+                          (if (str/includes? message "ERROR: duplicate key value")
+                            (assoc ctx :response (unprocessable-content "error"))
+                            (assoc ctx :response (bad-request "error"))))))
 
 (def routes
   (route/expand-routes
    #{
      ["/pessoas" :get [service-error-handler coerce-body content-neg-intc pesquisa-termo-route] :route-name :pesquisa-termo-route]
+     ["/pessoas" :post [service-error-handler coerce-body content-neg-intc (body-params/body-params) new-pessoa-route] :route-name :new-pessoa-route]
      ["/pessoas/:id" :get [service-error-handler coerce-body content-neg-intc detalhe-pessoa-route] :route-name :detalhe-pessoa-route]
      ["/contagem-pessoas" :get contagem-pessoas-route :route-name :contagem-pessoas-route]}))
 
@@ -105,3 +120,5 @@
 (defn restart []
   (stop-dev)
   (start-dev))
+
+(restart)

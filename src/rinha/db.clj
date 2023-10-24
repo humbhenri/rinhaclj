@@ -37,8 +37,9 @@
 (defn cria-pessoa [value]
   (let [stack (str/join "," (:stack value))
         text (str/join (->> (:stack value) (map str/lower-case) str/join)
-                       (list (:apelido value) (:nome value)))]
-    (j/insert! database-connection :pessoaentity (assoc value :stack stack :text text))))
+                       (list (:apelido value) (:nome value)))
+        id (UUID/randomUUID)]
+    (j/insert! database-connection :pessoaentity (assoc value :stack stack :text text :id id))))
 
 (defn contagem-pessoas []
   (-> {:select [[[:count :*]]] :from [:pessoaentity]}
@@ -69,7 +70,7 @@
       first
       formata-pessoa))
 
-;; (cria-pessoa {:id (UUID/randomUUID) :apelido "humb" :nome "Humberto" :nascimento "2000-10-01" :stack '("C#" "Node" "Oracle")})
+ ;; (cria-pessoa {:id (UUID/randomUUID) :apelido "humb2" :nome "Humberto" :nascimento "2000-10-01" :stack '("C#" "Node" "Oracle")})
 ;; (pesquisa-termo "humb")
 
 ;; (select (sql/format {:select [:*] :from :pessoaentity}))
