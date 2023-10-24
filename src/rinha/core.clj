@@ -5,6 +5,7 @@
                    [io.pedestal.http.body-params :as body-params]
                    [clojure.string :as str]
                    [clojure.data.json :as json]
+                   [taoensso.timbre :as timbre]
                    [rinha.db :as db]
                    [rinha.config :as config]))
 
@@ -84,7 +85,11 @@
 (def service-error-handler
   (error/error-dispatch [ctx ex]
                         :else
-                        (let [message (.getMessage (:exception (.getData ex)))]
+                        (let [message (->> ex
+                                           .getData
+                                           :exception
+                                           .getMessage)]
+                          (timbre/error message)
                           (if (str/includes? message "ERROR: duplicate key value")
                             (assoc ctx :response (unprocessable-content "error"))
                             (assoc ctx :response (bad-request "error"))))))
@@ -118,7 +123,8 @@
   (http/stop @server))
 
 (defn restart []
-  (stop-dev)
+  (when @server
+    (stop-dev))
   (start-dev))
 
 (restart)
