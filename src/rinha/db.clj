@@ -1,16 +1,19 @@
 (ns rinha.db
   (:require [clojure.java.jdbc :as j]
+            [clojure.string :as str]
             [honey.sql :as sql]
-            [hikari-cp.core :as cp])
+            [hikari-cp.core :as cp]
+            [rinha.config :as config])
   (:import [java.util UUID]))
 
+(def cfg (config/get-config))
 
 (def datasource-options
-  {:username           "sarah"
-   :password           "connor"
-   :port-number        5432
-   :database-name      "mydatabase"
-   :server-name        (or (System/getenv "DB_HOST") "localhost")
+  {:username           (get-in cfg [:db :username])
+   :password           (get-in cfg [:db :password])
+   :port-number        (get-in cfg [:db :port])
+   :database-name      (get-in cfg [:db :database])
+   :server-name        (get-in cfg [:db :server])
    :auto-commit        true
    :read-only          false
    :adapter            "postgresql"
@@ -32,7 +35,10 @@
   (j/query database-connection query))
 
 (defn cria-pessoa [value]
-  (j/insert! database-connection :pessoaentity value))
+  (let [stack (str/join "," (:stack value))
+        text (str/join (->> (:stack value) (map str/lower-case) str/join)
+                       (list (:apelido value) (:nome value)))]
+    (j/insert! database-connection :pessoaentity (assoc value :stack stack :text text))))
 
 (defn contagem-pessoas []
   (-> {:select [[[:count :*]]] :from [:pessoaentity]}
@@ -41,8 +47,16 @@
       first
       :count))
 
-;; (cria-pessoa {:id (UUID/randomUUID) :apelido "joao"})
+(defn formata-pessoa [pessoa]
+  (-> pessoa
+      (update :stack #(str/split % #","))
+      (dissoc :text)))
 
-(contagem-pessoas)
+(defn pesquisa-termo [termo]
+  (->> {:select [:*] :from :pessoaentity :where [:like :text (str/join ["%" termo "%"])]}
+      sql/format
+      select
+      (map formata-pessoa)))
 
-;; (select (sql/format {:select [:*] :from :pessoaentity}))
+;; (cria-pessoa {:id (UUID/randomUUID) :apelido "humb" :nome "Humberto" :nascimento "2000-10-01" :stack '("C#" "Node" "Oracle")})
+;; (pesquisa-termo "humb")

@@ -1,1 +1,6 @@
-{:server {:port #long #or [#env SERVER_PORT 8080]}}
+{:server {:port #long #or [#env SERVER_PORT 8080]}
+ :db     {:port #long #or [#env DB_PORT 5432]
+          :username #or [#env DB_USERNAME "sarah"]
+          :password #or [#env DB_PASSWORD "connor"]
+          :database #or [#env DB_DATABASE "mydatabase"]
+          :server #or [#env DB_HOST "localhost"]}}
