@@ -89,8 +89,8 @@
                                                    .getData
                                                    :exception
                                                    ex-data)]
-                          (if (= type :apelido-duplicado)
-                            (assoc ctx :response (unprocessable-content "error"))
+                          (case type
+                            :apelido-duplicado (assoc ctx :response (unprocessable-content "error"))
                             (assoc ctx :response (bad-request "error"))))))
 
 (def routes
