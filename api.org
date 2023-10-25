@@ -11,32 +11,31 @@ POST http://localhost:8080/pessoas
 Content-Type: application/json
 
 {
-    "apelido" : "josé341000",
-    "nome" : "José Roberto",
+    "apelido" : "josé3410001",
+    "nome" : "JJ",
     "nascimento" : "2000-10-01",
-    "stack" : ["C#", "Node", "Oracle"]
+    "stack" : ["C#", "Node", 123]
 }
 #+end_src
 
 #+RESULTS:
-#+BEGIN_SRC js
-""
-// POST http://localhost:8080/pessoas
-// HTTP/1.1 201 Created
-// X-Permitted-Cross-Domain-Policies: none
-// X-Download-Options: noopen
-// Server: undertow
-// X-XSS-Protection: 1; mode=block
-// X-Frame-Options: DENY
-// Location: /pessoas/15a867ac-6a78-4ecb-926f-07eafcc1ec06
-// Content-Security-Policy: object-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' 'strict-dynamic' https: http:;
-// Date: Wed, 25 Oct 2023 13:16:00 GMT
-// Connection: keep-alive
-// Strict-Transport-Security: max-age=31536000; includeSubdomains
-// X-Content-Type-Options: nosniff
-// Transfer-Encoding: chunked
-// Content-Type: application/json
-// Request duration: 0.006164s
+#+BEGIN_SRC text
+java.lang.UnsupportedOperationException in Interceptor  - count not supported on this type: Integer
+POST http://localhost:8080/pessoas
+HTTP/1.1 400 Bad Request
+X-Permitted-Cross-Domain-Policies: none
+X-Download-Options: noopen
+Server: undertow
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: DENY
+Content-Security-Policy: object-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' 'strict-dynamic' https: http:;
+Date: Wed, 25 Oct 2023 18:16:33 GMT
+Connection: keep-alive
+Strict-Transport-Security: max-age=31536000; includeSubdomains
+X-Content-Type-Options: nosniff
+Transfer-Encoding: chunked
+Content-Type: text/plain
+Request duration: 0.003741s
 #+END_SRC
 
 #+RESULTS:

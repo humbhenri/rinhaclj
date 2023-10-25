@@ -37,18 +37,48 @@
   (testing "detalhe de uma pessoa que nao existe deve retornar 404"
     (is (= 404 (:status (test-request :get (str "/pessoas/" (java.util.UUID/randomUUID))))))))
 
-(defn cria-pessoa []
+(defn cria-pessoa [& {:keys [apelido nome nascimento stack] :or
+                      {apelido (str "jose" (Math/random)),
+                       nome "José",
+                       nascimento "2000-01-01",
+                       stack ["C#", "Node", "Oracle"]}}]
   (-> {
-       :apelido (str "josé" (Math/random))
-       :nome "José Roberto"
-       :nascimento "2000-10-01"
-       :stack ["C#", "Node", "Oracle"]} json/write-str))
+       :apelido apelido
+       :nome nome
+       :nascimento nascimento
+       :stack stack} json/write-str))
 
 (deftest cria-pessoa-test
   (testing "para criaçao de pessoa válida, deve retornar 201 com o header correto"
     (let [{:keys [status headers]} (test-post-request "/pessoas" (cria-pessoa))]
-      (do
-        (is (= 201 status))
-        (is (str/includes? (get headers "Location") "/pessoas/"))))))
+      (is (= 201 status))
+      (is (str/includes? (get headers "Location") "/pessoas/"))))
+  (testing "stack é opcional"
+    (let [{:keys [status headers]} (test-post-request "/pessoas" (cria-pessoa :stack nil))]
+      (is (= 201 status))
+      (is (str/includes? (get headers "Location") "/pessoas/"))))
+  (testing "apelido deve ser único"
+    (let [apelido (str "teste" (Math/random))]
+      (test-post-request "/pessoas" (cria-pessoa :apelido apelido))
+      (let [{:keys [status headers]} (test-post-request "/pessoas" (cria-pessoa :apelido apelido))]
+        (is (= 422 status)))))
+  (testing "nome é obrigatório"
+    (let [{:keys [status headers]} (test-post-request "/pessoas" (cria-pessoa :nome nil))]
+      (is (= 422 status))))
+  (testing "apelido é obrigatório"
+    (let [{:keys [status headers]} (test-post-request "/pessoas" (cria-pessoa :apelido nil))]
+      (is (= 422 status))))
+  (testing "nome deve ter no máximo tamanho 100"
+    (let [{:keys [status headers]} (test-post-request "/pessoas" (cria-pessoa :nome (apply str (repeat 101 "1"))))]
+      (is (= 422 status))))
+  (testing "apelido deve ter no máximo tamanho 32"
+    (let [{:keys [status headers]} (test-post-request "/pessoas" (cria-pessoa :apelido (apply str (repeat 33 "1"))))]
+      (is (= 422 status))))
+  (testing "nascimento deve ter formato de data"
+    (let [{:keys [status headers]} (test-post-request "/pessoas" (cria-pessoa :nascimento "ksjfklsjdflkjs"))]
+      (is (= 422 status))))
+  (testing "cada elemento de stack deve ter no máximo tamanho 32"
+    (let [{:keys [status headers]} (test-post-request "/pessoas" (cria-pessoa :stack [(apply str (repeat 33 "1"))]))]
+      (is (= 422 status)))))
 
 (run-tests 'rinha.core-test)

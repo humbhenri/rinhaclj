@@ -7,7 +7,8 @@
                    [clojure.data.json :as json]
                    [taoensso.timbre :as timbre]
                    [rinha.db :as db]
-                   [rinha.config :as config]))
+                   [rinha.config :as config]
+                   [rinha.model :as model]))
 
 (defn response [status body & {:as headers}]
   {:status status :body body :headers headers})
@@ -77,11 +78,14 @@
     (not-found)))
 
 (defn new-pessoa-route [request]
-  (if-let* [pessoa (:json-params request)
-            pessoa-criada (db/cria-pessoa pessoa)
-            id (:id pessoa-criada)]
-    (created "" {"Location" (str "/pessoas/" id)})
-    (bad-request)))
+  (if-let [pessoa (:json-params request)]
+    (do
+      (model/validate-pessoa pessoa)
+      (if-let* [pessoa-criada (db/cria-pessoa pessoa)
+                id (:id pessoa-criada)]
+        (created "" {"Location" (str "/pessoas/" id)})
+        (bad-request "")))
+    (bad-request "")))
 
 (def service-error-handler
   (error/error-dispatch [ctx ex]
@@ -91,8 +95,9 @@
                                                    :exception
                                                    ex-data)]
                           (case type
-                            :apelido-duplicado (assoc ctx :response (unprocessable-content "error"))
-                            (assoc ctx :response (bad-request "error"))))))
+                            :apelido-duplicado (assoc ctx :response (unprocessable-content ""))
+                            :pessoa-invalida   (assoc ctx :response (unprocessable-content ""))
+                            (assoc ctx :response (bad-request (.getMessage ex)))))))
 
 (def routes
   (route/expand-routes

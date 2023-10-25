@@ -41,9 +41,8 @@
                        (map str/lower-case (list (:apelido value) (:nome value))))
         id (UUID/randomUUID)]
     (try
-      (->
-       (j/insert! database-connection :pessoaentity (assoc value :stack stack :text text :id id))
-       first)
+      (first
+       (j/insert! database-connection :pessoaentity (assoc value :stack stack :text text :id id)))
       (catch java.lang.Exception e
         (timbre/error (.getMessage e))
         (if (str/includes? (.getMessage e) "ERROR: duplicate key value")

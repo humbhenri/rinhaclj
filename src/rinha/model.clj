@@ -1,16 +1,16 @@
 (ns rinha.model
   (:require [clova.core :refer :all]))
 
-(validate [:nome required? stringy? [longer? 0] [shorter? 101]
-          :apelido required? stringy? [longer? 0] [shorter? 33]
-          :nascimento required? [matches? #"\d{4}-\d{2}-\d{2}"]]
-          {:apelido "joao"
-           :nome "231"
-           :nascimento "1985-09-01"
-           :stack nil})
+(defn validate-stack [stack]
+  (or (nil? stack)
+      (empty? stack)
+      (every? #(and (< (count %) 33) (> (count %) 0)) stack)))
 
+(def spec [:nome required? stringy? [longer? 0] [shorter? 101]
+           :apelido required? stringy? [longer? 0] [shorter? 33]
+           :nascimento required? [matches? #"\d{4}-\d{2}-\d{2}"]
+           :stack validate-stack])
 
-(results [:nome stringy? [longer? 0] [shorter? 2]
-          :apelido stringy?]
-         {:nome "a" :apelido 1})
-
+(defn validate-pessoa [{:keys [nome apelido nascimento stack] :as pessoa}]
+  (when-not (valid? spec pessoa)
+    (throw (ex-info "pessoa inválida" {:type :pessoa-invalida}))))
