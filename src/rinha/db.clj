@@ -38,10 +38,12 @@
 (defn cria-pessoa [value]
   (let [stack (str/join "," (:stack value))
         text (str/join (->> (:stack value) (map str/lower-case) str/join)
-                       (list (:apelido value) (:nome value)))
+                       (map str/lower-case (list (:apelido value) (:nome value))))
         id (UUID/randomUUID)]
     (try
-      (j/insert! database-connection :pessoaentity (assoc value :stack stack :text text :id id))
+      (->
+       (j/insert! database-connection :pessoaentity (assoc value :stack stack :text text :id id))
+       first)
       (catch java.lang.Exception e
         (timbre/error (.getMessage e))
         (if (str/includes? (.getMessage e) "ERROR: duplicate key value")
@@ -77,7 +79,7 @@
       first
       formata-pessoa))
 
- ;; (cria-pessoa {:id (UUID/randomUUID) :apelido "humb2" :nome "Humberto" :nascimento "2000-10-01" :stack '("C#" "Node" "Oracle")})
+  ;; (cria-pessoa {:id (UUID/randomUUID) :apelido "humb3" :nome "Humberto" :nascimento "2000-10-01" :stack '("C#" "Node" "Oracle")})
 ;; (pesquisa-termo "humb")
 
 ;; (select (sql/format {:select [:*] :from :pessoaentity}))

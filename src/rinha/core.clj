@@ -78,8 +78,9 @@
 
 (defn new-pessoa-route [request]
   (if-let* [pessoa (:json-params request)
-            pessoa-criada (db/cria-pessoa pessoa)]
-    (ok (:id pessoa-criada))
+            pessoa-criada (db/cria-pessoa pessoa)
+            id (:id pessoa-criada)]
+    (created "" {"Location" (str "/pessoas/" id)})
     (bad-request)))
 
 (def service-error-handler
