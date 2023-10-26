@@ -30,10 +30,8 @@
 (defonce datasource
   (delay (cp/make-datasource datasource-options)))
 
-(def database-connection {:datasource @datasource})
-
 (defn select [query]
-  (j/query database-connection query))
+  (j/query {:datasource @datasource} query))
 
 (defn cria-pessoa [value]
   (let [stack (str/join "," (:stack value))
@@ -42,7 +40,7 @@
         id (UUID/randomUUID)]
     (try
       (first
-       (j/insert! database-connection :pessoaentity (assoc value :stack stack :text text :id id)))
+       (j/insert! {:datasource @datasource} :pessoaentity (assoc value :stack stack :text text :id id)))
       (catch java.lang.Exception e
         (timbre/error (.getMessage e))
         (if (str/includes? (.getMessage e) "ERROR: duplicate key value")
@@ -77,9 +75,3 @@
       select
       first
       formata-pessoa))
-
-  ;; (cria-pessoa {:id (UUID/randomUUID) :apelido "humb3" :nome "Humberto" :nascimento "2000-10-01" :stack '("C#" "Node" "Oracle")})
-;; (pesquisa-termo "humb")
-
-;; (select (sql/format {:select [:*] :from :pessoaentity}))
-;; (detalhe-pessoa (str (UUID/randomUUID)))

@@ -8,7 +8,8 @@
                    [taoensso.timbre :as timbre]
                    [rinha.db :as db]
                    [rinha.config :as config]
-                   [rinha.model :as model]))
+                   [rinha.model :as model])
+    (:gen-class))
 
 (defn response [status body & {:as headers}]
   {:status status :body body :headers headers})
@@ -94,6 +95,7 @@
                                                    .getData
                                                    :exception
                                                    ex-data)]
+                          (timbre/error (ex-message ex))
                           (case type
                             :apelido-duplicado (assoc ctx :response (unprocessable-content ""))
                             :pessoa-invalida   (assoc ctx :response (unprocessable-content ""))
@@ -105,11 +107,12 @@
      ["/pessoas" :get [service-error-handler coerce-body content-neg-intc pesquisa-termo-route] :route-name :pesquisa-termo-route]
      ["/pessoas" :post [service-error-handler coerce-body content-neg-intc (body-params/body-params) new-pessoa-route] :route-name :new-pessoa-route]
      ["/pessoas/:id" :get [service-error-handler coerce-body content-neg-intc detalhe-pessoa-route] :route-name :detalhe-pessoa-route]
-     ["/contagem-pessoas" :get contagem-pessoas-route :route-name :contagem-pessoas-route]}))
+     ["/contagem-pessoas" :get [service-error-handler contagem-pessoas-route] :route-name :contagem-pessoas-route]}))
 
 (def service-map
   {::http/routes routes
    ::http/type   :immutant
+   ::http/host   "0.0.0.0"
    ::http/port   (get-in (config/get-config) [:server :port])})
 
 (defn start []
@@ -132,4 +135,5 @@
     (stop-dev))
   (start-dev))
 
-(restart)
+(defn -main[& args]
+  (start))

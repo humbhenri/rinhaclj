@@ -11,5 +11,6 @@
         hikari-cp/hikari-cp {:mvn/version "3.0.1" :exclusions ['org.slf4j/slf4j-api]}
         aero/aero {:mvn/version "1.1.6"}
         com.taoensso/timbre {:mvn/version "6.3.1"}}
- :aliases
- {:test {:extra-paths ["test"]}}}
+ :aliases {:test {:extra-paths ["test"]}
+           :build {:deps {io.github.clojure/tools.build {:git/tag "v0.9.6" :git/sha "8e78bcc"}}
+                   :ns-default build}}}
