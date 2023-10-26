@@ -2,27 +2,27 @@
 
 * Contagem pessoas
 #+begin_src restclient
-GET http://localhost:3000/contagem-pessoas
+GET http://localhost:9999/contagem-pessoas
 #+end_src
 
 #+RESULTS:
 #+BEGIN_SRC text
 0
-GET http://localhost:8080/contagem-pessoas
+GET http://localhost:9999/contagem-pessoas
 HTTP/1.1 200 OK
+Server: nginx/1.25.2
+Date: Thu, 26 Oct 2023 18:32:47 GMT
+Content-Type: text/plain
+Transfer-Encoding: chunked
+Connection: keep-alive
 X-Permitted-Cross-Domain-Policies: none
 X-Download-Options: noopen
-Server: undertow
 X-XSS-Protection: 1; mode=block
 X-Frame-Options: DENY
 Content-Security-Policy: object-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' 'strict-dynamic' https: http:;
-Date: Thu, 26 Oct 2023 14:18:08 GMT
-Connection: keep-alive
 Strict-Transport-Security: max-age=31536000; includeSubdomains
 X-Content-Type-Options: nosniff
-Transfer-Encoding: chunked
-Content-Type: text/plain
-Request duration: 0.005181s
+Request duration: 0.893319s
 #+END_SRC
 
 * Cria pessoa

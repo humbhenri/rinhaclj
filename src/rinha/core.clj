@@ -99,7 +99,7 @@
                           (case type
                             :apelido-duplicado (assoc ctx :response (unprocessable-content ""))
                             :pessoa-invalida   (assoc ctx :response (unprocessable-content ""))
-                            (assoc ctx :response (bad-request (.getMessage ex)))))))
+                            (assoc ctx :io.pedestal.interceptor.chain/error ex)))))
 
 (def routes
   (route/expand-routes
