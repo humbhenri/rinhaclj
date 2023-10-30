@@ -57,7 +57,7 @@
 (defn pesquisa-termo-route [request]
   (if-let [termo (get-in request [:query-params :t])]
     (ok (db/pesquisa-termo termo))
-    (bad-request)))
+    (bad-request "")))
 
 (defn contagem-pessoas-route [request]
   (ok (str (db/contagem-pessoas)) {"content-type" "text/plain"}))
@@ -137,3 +137,7 @@
 
 (defn -main[& args]
   (start))
+
+(comment
+(restart)
+  ,)

@@ -81,4 +81,5 @@
     (let [{:keys [status headers]} (test-post-request "/pessoas" (cria-pessoa :stack [(apply str (repeat 33 "1"))]))]
       (is (= 422 status)))))
 
+(sut/restart)
 (run-tests 'rinha.core-test)
